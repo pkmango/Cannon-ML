@@ -10,6 +10,8 @@ public class GunAgent : Agent
     public float gunTurningSpeed = 5;
     [Min(0.1f)]
     public float shotDelay = 0.5f;
+    [Min(0.04f)]
+    public float laserVisibilityDelay = 0.1f;
     public LineRenderer laserRenderer;
     public Transform laserFirePoint;
     public float defDistanceRay = 100f;
@@ -52,7 +54,9 @@ public class GunAgent : Agent
     private IEnumerator Shot()
     {
         shotAllowed = false;
-        Debug.Log("Выстрел!");
+        laserRenderer.enabled = true;
+        
+        Debug.Log("Выстрел!" + laserRenderer.widthCurve);
 
         if (Physics.Raycast(laserFirePoint.position, laserFirePoint.forward, out RaycastHit hit))
         {
@@ -62,6 +66,9 @@ public class GunAgent : Agent
         {
             DrawLaser(laserFirePoint.position, laserFirePoint.forward * defDistanceRay);
         }
+
+        yield return new WaitForSeconds(laserVisibilityDelay);
+        laserRenderer.enabled = false;
 
         yield return new WaitForSeconds(shotDelay);
         shotAllowed = true;
