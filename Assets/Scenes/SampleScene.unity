@@ -152,6 +152,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   respawnZones:
   - {fileID: 1535392903}
+  - {fileID: 2133869207}
+  - {fileID: 1380106156}
+  - {fileID: 863973904}
   enemyPrefab: {fileID: 3892946703528630059, guid: c203604c6962ab244918b1e06b7a13ab,
     type: 3}
   enemySpawnDelay: 1
@@ -399,6 +402,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8cf655504faec934ab8031a673006228, type: 3}
+--- !u!1 &863973904 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3451703968386879398, guid: 8cf655504faec934ab8031a673006228,
+    type: 3}
+  m_PrefabInstance: {fileID: 839713877}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -456,7 +465,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 567
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -482,6 +491,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!1 &1380106156 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3451703968386879398, guid: 8cf655504faec934ab8031a673006228,
+    type: 3}
+  m_PrefabInstance: {fileID: 467463509}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1407577784
 GameObject:
   m_ObjectHideFlags: 0
@@ -705,6 +720,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8cf655504faec934ab8031a673006228, type: 3}
+--- !u!1 &2133869207 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3451703968386879398, guid: 8cf655504faec934ab8031a673006228,
+    type: 3}
+  m_PrefabInstance: {fileID: 2040554848}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4570100340908309196
 PrefabInstance:
   m_ObjectHideFlags: 0
