@@ -359,6 +359,11 @@ MonoBehaviour:
   laserRenderer: {fileID: 7098731139410124}
   laserFirePoint: {fileID: 1477803175772047373}
   defDistanceRay: 100
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 512
+  EnemyDetectionRadius: 6
+  observedEnemiesNumber: 5
 --- !u!114 &7199920842229505743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -372,8 +377,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 1
-    NumStackedVectorObservations: 1
+    VectorObservationSize: 11
+    NumStackedVectorObservations: 3
     m_ActionSpec:
       m_NumContinuousActions: 1
       BranchSizes: 01000000

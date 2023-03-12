@@ -23,6 +23,6 @@ public class Enemy : MonoBehaviour
 
     private void OnDestroy()
     {
-        Debug.Log(gameObject.name + " has been destroyed");
+        //Debug.Log(gameObject.name + " has been destroyed");
     }
 }

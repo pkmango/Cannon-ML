@@ -15,12 +15,27 @@ public class GunAgent : Agent
     public LineRenderer laserRenderer;
     public Transform laserFirePoint;
     public float defDistanceRay = 100f;
+    public LayerMask enemyLayerMask;
+    [Min(1f)]
+    public float enemyDetectionRadius = 6f;
+    [Tooltip("Each observable enemy adds 2 values to Vector Observations > Space Size")]
+    public int observedEnemiesNumber = 5;
 
     private bool shotAllowed = true;
 
-    void Start()
+    void Awake()
+    {
+        //observedEnemyPositions = new Collider[observedEnemiesNumber];
+    }
+
+    private void Start()
     {
 
+    }
+
+    void FixedUpdate()
+    {
+        //EnemyDetection();
     }
 
     public override void OnEpisodeBegin()
@@ -30,6 +45,29 @@ public class GunAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
+        Collider[] enemiesPositions = Physics.OverlapSphere(transform.position, enemyDetectionRadius, enemyLayerMask);
+
+        for (int i = 0; i < enemiesPositions.Length; i++)
+        {
+            if (i < observedEnemiesNumber)
+            {
+                sensor.AddObservation(GetNoramalizedVector2(enemiesPositions[i].transform.position));
+            }
+            else
+            {
+                return;
+            }
+
+        }
+
+        if (enemiesPositions.Length < observedEnemiesNumber)
+        {
+            for (int i = 0; i < (observedEnemiesNumber - enemiesPositions.Length); i++)
+            {
+                sensor.AddObservation(Vector2.zero);
+            }
+        }
+
         sensor.AddObservation(1f);
     }
 
@@ -49,6 +87,14 @@ public class GunAgent : Agent
         var discreteActionsOut = actionsOut.DiscreteActions;
         continuousActionsOut[0] = Input.GetAxis("Horizontal");
         discreteActionsOut[0] = Input.GetKey(KeyCode.Space) ? 1 : 0;
+    }
+
+    private Vector2 GetNoramalizedVector2(Vector3 enemyPosition)
+    {
+        float normalizedValueX = (enemyPosition.x + enemyDetectionRadius) / (enemyDetectionRadius * 2f);
+        float normalizedValueZ = (enemyPosition.z + enemyDetectionRadius) / (enemyDetectionRadius * 2f);
+
+        return new Vector2(normalizedValueX, normalizedValueZ);
     }
 
     private IEnumerator Shot()
