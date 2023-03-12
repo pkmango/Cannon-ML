@@ -55,12 +55,11 @@ public class GunAgent : Agent
     {
         shotAllowed = false;
         laserRenderer.enabled = true;
-        
-        Debug.Log("Выстрел!" + laserRenderer.widthCurve);
 
         if (Physics.Raycast(laserFirePoint.position, laserFirePoint.forward, out RaycastHit hit))
         {
             DrawLaser(laserFirePoint.position, hit.point);
+            DestroyEnemy(hit.transform.gameObject);
         }
         else
         {
@@ -78,6 +77,20 @@ public class GunAgent : Agent
     {
         laserRenderer.SetPosition(0, startPos);
         laserRenderer.SetPosition(1, endPos);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Enemy")
+        {
+            Debug.Log("Enemy touch");
+            DestroyEnemy(other.gameObject);
+        }
+    }
+
+    private void DestroyEnemy(GameObject enemy)
+    {
+        Destroy(enemy);
     }
 
 }

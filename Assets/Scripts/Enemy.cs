@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
@@ -18,9 +16,13 @@ public class Enemy : MonoBehaviour
         moveDirection = Vector3.Normalize(player.transform.position - transform.position);
     }
 
-    // Update is called once per frame
     void Update()
     {
         transform.Translate(speed * Time.deltaTime * moveDirection, Space.World);
+    }
+
+    private void OnDestroy()
+    {
+        Debug.Log(gameObject.name + " has been destroyed");
     }
 }
