@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4804746657365043483}
   - component: {fileID: 1368507771913096216}
   - component: {fileID: 5521575305924304386}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -313,7 +313,7 @@ GameObject:
   - component: {fileID: 7199920842229505743}
   - component: {fileID: 6996535804668524430}
   - component: {fileID: 4408729498128361093}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Gun
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -356,9 +356,11 @@ MonoBehaviour:
   gunTurningSpeed: 5
   shotDelay: 0.5
   laserVisibilityDelay: 0.05
+  hp: 20
+  winPoints: 20
   laserRenderer: {fileID: 7098731139410124}
   laserFirePoint: {fileID: 1477803175772047373}
-  defDistanceRay: 100
+  defDistanceRay: 10
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 512

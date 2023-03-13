@@ -12,6 +12,10 @@ public class GunAgent : Agent
     public float shotDelay = 0.5f;
     [Min(0.04f)]
     public float laserVisibilityDelay = 0.1f;
+    [Min(1)]
+    public int hp = 20;
+    [Min(1)]
+    public int winPoints = 20;
     public LineRenderer laserRenderer;
     public Transform laserFirePoint;
     public float defDistanceRay = 100f;
@@ -22,31 +26,34 @@ public class GunAgent : Agent
     public int observedEnemiesNumber = 5; //Maximum number of simultaneously observed enemies
 
     private bool shotAllowed = true;
-
-    void Awake()
-    {
-        
-    }
+    private Quaternion startGunRotation;
+    private int currentPoints = 0;
+    private int currentHp = 20;
 
     private void Start()
     {
-
-    }
-
-    void FixedUpdate()
-    {
-        
+        startGunRotation = transform.rotation;
     }
 
     public override void OnEpisodeBegin()
     {
+        GameObject[] allEnemies = GameObject.FindGameObjectsWithTag("Enemy");
+        
+        foreach(GameObject i in allEnemies)
+        {
+            Destroy(i);
+        }
 
+        shotAllowed = true;
+        transform.rotation = startGunRotation;
+        currentPoints = 0;
+        currentHp = hp;
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        //It is necessary to find all observed enemies in a given radius and transfer given number <observedEnemiesNumber>
-        //in the form of flat normalized coordinates Vector2 to the sensor
+        // It is necessary to find all observed enemies in a given radius and transfer given number <observedEnemiesNumber>
+        // in the form of flat normalized coordinates Vector2 to the sensor
         Collider[] enemiesPositions = Physics.OverlapSphere(transform.position, enemyDetectionRadius, enemyLayerMask);
 
         for (int i = 0; i < enemiesPositions.Length; i++)
@@ -57,9 +64,8 @@ public class GunAgent : Agent
             }
             else
             {
-                return;
+                break;
             }
-
         }
 
         // If the number of observed enemies is less than <observedEnemiesNumber>,
@@ -113,6 +119,10 @@ public class GunAgent : Agent
         {
             DrawLaser(laserFirePoint.position, hit.point);
             DestroyEnemy(hit.transform.gameObject);
+            AddReward(0.05f);
+            currentPoints++;
+            if (currentPoints == winPoints)
+                EndEpisode();
         }
         else
         {
@@ -136,8 +146,11 @@ public class GunAgent : Agent
     {
         if (other.tag == "Enemy")
         {
-            Debug.Log("Enemy touch");
             DestroyEnemy(other.gameObject);
+            AddReward(-0.05f);
+            currentHp--;
+            if (currentHp == 0)
+                EndEpisode();
         }
     }
 
