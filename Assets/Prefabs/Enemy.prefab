@@ -107,3 +107,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0.8
+  playerDetectionDistance: 10
+  playerLayerMask:
+    serializedVersion: 2
+    m_Bits: 1024
