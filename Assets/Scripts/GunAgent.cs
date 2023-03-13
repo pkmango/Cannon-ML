@@ -19,13 +19,13 @@ public class GunAgent : Agent
     [Min(1f)]
     public float enemyDetectionRadius = 6f;
     [Tooltip("Each observable enemy adds 2 values to Vector Observations > Space Size")]
-    public int observedEnemiesNumber = 5;
+    public int observedEnemiesNumber = 5; //Maximum number of simultaneously observed enemies
 
     private bool shotAllowed = true;
 
     void Awake()
     {
-        //observedEnemyPositions = new Collider[observedEnemiesNumber];
+        
     }
 
     private void Start()
@@ -35,7 +35,7 @@ public class GunAgent : Agent
 
     void FixedUpdate()
     {
-        //EnemyDetection();
+        
     }
 
     public override void OnEpisodeBegin()
@@ -45,6 +45,8 @@ public class GunAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
+        //It is necessary to find all observed enemies in a given radius and transfer given number <observedEnemiesNumber>
+        //in the form of flat normalized coordinates Vector2 to the sensor
         Collider[] enemiesPositions = Physics.OverlapSphere(transform.position, enemyDetectionRadius, enemyLayerMask);
 
         for (int i = 0; i < enemiesPositions.Length; i++)
@@ -60,6 +62,8 @@ public class GunAgent : Agent
 
         }
 
+        // If the number of observed enemies is less than <observedEnemiesNumber>,
+        // then the remaining free cells of the array are filled with zeros
         if (enemiesPositions.Length < observedEnemiesNumber)
         {
             for (int i = 0; i < (observedEnemiesNumber - enemiesPositions.Length); i++)
@@ -68,7 +72,10 @@ public class GunAgent : Agent
             }
         }
 
-        sensor.AddObservation(1f);
+        // Normalized rotation around the y-axis [0,1]
+        sensor.AddObservation(transform.rotation.eulerAngles.y / 360.0f);
+
+        sensor.AddObservation(shotAllowed);
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
