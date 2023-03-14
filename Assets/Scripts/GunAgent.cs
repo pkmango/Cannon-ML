@@ -54,26 +54,19 @@ public class GunAgent : Agent
     {
         // It is necessary to find all observed enemies in a given radius and transfer given number <observedEnemiesNumber>
         // in the form of flat normalized coordinates Vector2 to the sensor
-        Collider[] enemiesPositions = Physics.OverlapSphere(transform.position, enemyDetectionRadius, enemyLayerMask);
+        Collider[] enemiesColliders = new Collider[observedEnemiesNumber];
+        Physics.OverlapSphereNonAlloc(transform.position, enemyDetectionRadius, enemiesColliders, enemyLayerMask);
 
-        for (int i = 0; i < enemiesPositions.Length; i++)
+        foreach(Collider enemyCollider in enemiesColliders)
         {
-            if (i < observedEnemiesNumber)
+            if(enemyCollider != null)
             {
-                sensor.AddObservation(GetNoramalizedVector2(enemiesPositions[i].transform.position));
+                sensor.AddObservation(GetNoramalizedVector2(enemyCollider.transform.position));
             }
             else
             {
-                break;
-            }
-        }
-
-        // If the number of observed enemies is less than <observedEnemiesNumber>,
-        // then the remaining free cells of the array are filled with zeros
-        if (enemiesPositions.Length < observedEnemiesNumber)
-        {
-            for (int i = 0; i < (observedEnemiesNumber - enemiesPositions.Length); i++)
-            {
+                // If the number of observed enemies is less than <observedEnemiesNumber>,
+                // then the remaining free cells of the array are filled with zeros
                 sensor.AddObservation(Vector2.zero);
             }
         }
