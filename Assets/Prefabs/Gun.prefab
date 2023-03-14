@@ -347,13 +347,14 @@ MonoBehaviour:
   winPoints: 20
   laserRenderer: {fileID: 7098731139410124}
   laserFirePoint: {fileID: 1477803175772047373}
-  defDistanceRay: 10
+  rayDistance: 10
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 512
   enemyDetectionRadius: 6
   observedEnemiesNumber: 5
   enemies: []
+  point: {fileID: 0}
 --- !u!114 &7199920842229505743
 MonoBehaviour:
   m_ObjectHideFlags: 0

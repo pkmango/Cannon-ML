@@ -18,7 +18,7 @@ public class GunAgent : Agent
     public int winPoints = 20;
     public LineRenderer laserRenderer;
     public Transform laserFirePoint;
-    public float defDistanceRay = 100f;
+    public float rayDistance = 10f;
     public LayerMask enemyLayerMask;
     [Min(1f)]
     public float enemyDetectionRadius = 6f;
@@ -46,7 +46,9 @@ public class GunAgent : Agent
         }
         enemies.Clear();
 
-        StopCoroutine(shotCor);
+        if (shotCor != null)
+            StopCoroutine(shotCor);
+
         shotAllowed = true;
         transform.rotation = startGunRotation;
         currentPoints = 0;
@@ -111,7 +113,7 @@ public class GunAgent : Agent
         shotAllowed = false;
         laserRenderer.enabled = true;
 
-        if (Physics.Raycast(laserFirePoint.position, laserFirePoint.forward, out RaycastHit hit))
+        if (Physics.Raycast(laserFirePoint.position, laserFirePoint.forward, out RaycastHit hit, rayDistance))
         {
             DrawLaser(laserFirePoint.position, hit.point);
             DestroyEnemy(hit.transform.gameObject);
@@ -122,7 +124,7 @@ public class GunAgent : Agent
         }
         else
         {
-            DrawLaser(laserFirePoint.position, laserFirePoint.forward * defDistanceRay);
+            DrawLaser(laserFirePoint.position, laserFirePoint.forward * rayDistance + transform.position);
         }
 
         yield return new WaitForSeconds(laserVisibilityDelay);
