@@ -9,7 +9,6 @@ public class GameController : MonoBehaviour
     [Min(0.5f)]
     public float enemySpawnDelay = 1f;
 
-    private List<GameObject> enemies = new List<GameObject>();
     private Coroutine enemySpawnCor;
 
     private void Start()

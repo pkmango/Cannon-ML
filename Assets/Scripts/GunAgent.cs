@@ -24,11 +24,14 @@ public class GunAgent : Agent
     public float enemyDetectionRadius = 6f;
     [Tooltip("Each observable enemy adds 2 values to Vector Observations > Space Size")]
     public int observedEnemiesNumber = 5; //Maximum number of simultaneously observed enemies
+    [HideInInspector]
+    public List<GameObject> enemies = new List<GameObject>();
 
     private bool shotAllowed = true;
     private Quaternion startGunRotation;
     private int currentPoints = 0;
     private int currentHp = 20;
+    private Coroutine shotCor;
 
     private void Start()
     {
@@ -37,13 +40,13 @@ public class GunAgent : Agent
 
     public override void OnEpisodeBegin()
     {
-        GameObject[] allEnemies = GameObject.FindGameObjectsWithTag("Enemy");
-        
-        foreach(GameObject i in allEnemies)
+        foreach(GameObject i in enemies)
         {
             Destroy(i);
         }
+        enemies.Clear();
 
+        StopCoroutine(shotCor);
         shotAllowed = true;
         transform.rotation = startGunRotation;
         currentPoints = 0;
@@ -84,7 +87,7 @@ public class GunAgent : Agent
 
         int controlSignalShot = actionBuffers.DiscreteActions[0];
         if (controlSignalShot == 1 && shotAllowed)
-            StartCoroutine(Shot());
+            shotCor = StartCoroutine(Shot());
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)

@@ -12,6 +12,8 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         Vector3 playerPosition = GetPlayerPosition();
+        if (player != null)
+            player.GetComponent<GunAgent>().enemies.Add(gameObject);
 
         // Altitude correction
         transform.position = new Vector3(transform.position.x, playerPosition.y, transform.position.z);
