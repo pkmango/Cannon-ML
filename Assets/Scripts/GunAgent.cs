@@ -49,6 +49,7 @@ public class GunAgent : Agent
         if (shotCor != null)
             StopCoroutine(shotCor);
 
+        laserRenderer.enabled = false;
         shotAllowed = true;
         transform.rotation = startGunRotation;
         currentPoints = 0;
@@ -78,7 +79,7 @@ public class GunAgent : Agent
 
         // Normalized rotation around the y-axis [0,1]
         sensor.AddObservation(transform.rotation.eulerAngles.y / 360.0f);
-
+        
         sensor.AddObservation(shotAllowed);
     }
 
@@ -102,9 +103,10 @@ public class GunAgent : Agent
 
     private Vector2 GetNoramalizedVector2(Vector3 enemyPosition)
     {
+        enemyPosition -= transform.position;
         float normalizedValueX = (enemyPosition.x + enemyDetectionRadius) / (enemyDetectionRadius * 2f);
         float normalizedValueZ = (enemyPosition.z + enemyDetectionRadius) / (enemyDetectionRadius * 2f);
-
+        //Debug.Log(new Vector2(normalizedValueX, normalizedValueZ));
         return new Vector2(normalizedValueX, normalizedValueZ);
     }
 
@@ -112,7 +114,7 @@ public class GunAgent : Agent
     {
         shotAllowed = false;
         laserRenderer.enabled = true;
-
+        //Debug.Log("SHOT");
         if (Physics.Raycast(laserFirePoint.position, laserFirePoint.forward, out RaycastHit hit, rayDistance))
         {
             DrawLaser(laserFirePoint.position, hit.point);

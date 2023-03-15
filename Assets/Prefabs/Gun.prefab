@@ -342,7 +342,7 @@ MonoBehaviour:
   MaxStep: 0
   gunTurningSpeed: 5
   shotDelay: 0.5
-  laserVisibilityDelay: 0.05
+  laserVisibilityDelay: 0.4
   hp: 20
   winPoints: 20
   laserRenderer: {fileID: 7098731139410124}
@@ -354,7 +354,6 @@ MonoBehaviour:
   enemyDetectionRadius: 6
   observedEnemiesNumber: 5
   enemies: []
-  point: {fileID: 0}
 --- !u!114 &7199920842229505743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -369,10 +368,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_BrainParameters:
     VectorObservationSize: 12
-    NumStackedVectorObservations: 3
+    NumStackedVectorObservations: 7
     m_ActionSpec:
       m_NumContinuousActions: 1
-      BranchSizes: 01000000
+      BranchSizes: 02000000
     VectorActionSize: 
     VectorActionDescriptions: []
     VectorActionSpaceType: 0

@@ -166,7 +166,7 @@ MonoBehaviour:
   - {fileID: 1099888557960684246}
   enemyPrefab: {fileID: 3892946703528630059, guid: c203604c6962ab244918b1e06b7a13ab,
     type: 3}
-  enemySpawnDelay: 1
+  enemySpawnDelay: 1.1
 --- !u!1001 &2290430757743940585
 PrefabInstance:
   m_ObjectHideFlags: 0
