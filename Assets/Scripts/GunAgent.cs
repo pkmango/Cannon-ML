@@ -26,23 +26,29 @@ public class GunAgent : Agent
     public int observedEnemiesNumber = 5; //Maximum number of simultaneously observed enemies
     [HideInInspector]
     public List<GameObject> enemies = new List<GameObject>();
+    public Color detectedEnemyColor = Color.white;
 
     private bool shotAllowed = true;
     private Quaternion startGunRotation;
     private int currentPoints = 0;
     private int currentHp = 20;
     private Coroutine shotCor;
+    private Material enemyMaterial;
+    // list of tracked targets
+    private List<GameObject> observedEnemies;
 
     private void Start()
     {
         startGunRotation = transform.rotation;
+        observedEnemies = new List<GameObject>(observedEnemiesNumber);
+        //Debug.Log(observedEnemies.Count);
     }
 
     public override void OnEpisodeBegin()
     {
         foreach(GameObject i in enemies)
         {
-            Destroy(i);
+            DestroyEnemy(i);
         }
         enemies.Clear();
 
@@ -63,23 +69,64 @@ public class GunAgent : Agent
         Collider[] enemiesColliders = new Collider[observedEnemiesNumber];
         Physics.OverlapSphereNonAlloc(transform.position, enemyDetectionRadius, enemiesColliders, enemyLayerMask);
 
-        foreach(Collider enemyCollider in enemiesColliders)
+        foreach (Collider enemyCollider in enemiesColliders)
         {
-            if(enemyCollider != null)
+            if (enemyCollider != null && observedEnemies.Count < observedEnemiesNumber)
             {
-                sensor.AddObservation(GetNoramalizedVector2(enemyCollider.transform.position));
+                if (!observedEnemies.Contains(enemyCollider.gameObject))
+                {
+                    observedEnemies.Add(enemyCollider.gameObject);
+
+                    enemyMaterial = enemyCollider.GetComponent<Renderer>().material;
+                    enemyMaterial.color = detectedEnemyColor;
+                }
             }
             else
             {
-                // If the number of observed enemies is less than <observedEnemiesNumber>,
-                // then the remaining free cells of the array are filled with zeros
+                break;
+            }
+        }
+
+        foreach (GameObject enemy in observedEnemies)
+        {
+            sensor.AddObservation(GetNoramalizedVector2(enemy.transform.position));
+        }
+
+        int difference = observedEnemiesNumber - observedEnemies.Count;
+        if (difference > 0)
+        {
+            for (int i = 0; i < difference; i++)
+            {
                 sensor.AddObservation(Vector2.zero);
             }
         }
 
+        if (difference < 0)
+        {
+            Debug.Log("Error. <observedEnemies.Count> exceeded the expected parameters");
+        }
+
+        //foreach (Collider enemyCollider in enemiesColliders)
+        //{
+
+        //    if (enemyCollider != null)
+        //    {
+        //        enemyMaterial = enemyCollider.GetComponent<Renderer>().material;
+        //        enemyMaterial.color = detectedEnemyColor;
+
+        //        sensor.AddObservation(GetNoramalizedVector2(enemyCollider.transform.position));
+        //    }
+        //    else
+        //    {
+        //        // If the number of observed enemies is less than <observedEnemiesNumber>,
+        //        // then the remaining free cells of the array are filled with zeros
+        //        sensor.AddObservation(Vector2.zero);
+        //    }
+        //}
+
         // Normalized rotation around the y-axis [0,1]
         sensor.AddObservation(transform.rotation.eulerAngles.y / 360.0f);
-        
+
         sensor.AddObservation(shotAllowed);
     }
 
@@ -156,6 +203,9 @@ public class GunAgent : Agent
 
     private void DestroyEnemy(GameObject enemy)
     {
+        if (observedEnemies.Contains(enemy))
+            observedEnemies.Remove(enemy);
+
         Destroy(enemy);
     }
 

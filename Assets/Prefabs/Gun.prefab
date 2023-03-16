@@ -341,8 +341,8 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
   gunTurningSpeed: 5
-  shotDelay: 0.5
-  laserVisibilityDelay: 0.4
+  shotDelay: 0.4
+  laserVisibilityDelay: 0.2
   hp: 20
   winPoints: 20
   laserRenderer: {fileID: 7098731139410124}
@@ -354,6 +354,7 @@ MonoBehaviour:
   enemyDetectionRadius: 6
   observedEnemiesNumber: 5
   enemies: []
+  detectedEnemyColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &7199920842229505743
 MonoBehaviour:
   m_ObjectHideFlags: 0
