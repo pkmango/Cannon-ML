@@ -340,7 +340,7 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
-  gunTurningSpeed: 5
+  gunTurningSpeed: 3.5
   shotDelay: 0.4
   laserVisibilityDelay: 0.2
   hp: 20
@@ -352,7 +352,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   enemyDetectionRadius: 6
-  observedEnemiesNumber: 5
+  observedEnemiesNumber: 1
   enemies: []
   detectedEnemyColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &7199920842229505743
@@ -368,12 +368,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 12
+    VectorObservationSize: 3
     NumStackedVectorObservations: 7
     m_ActionSpec:
-      m_NumContinuousActions: 1
-      BranchSizes: 02000000
-    VectorActionSize: 
+      m_NumContinuousActions: 0
+      BranchSizes: 0200000003000000
+    VectorActionSize: 0200000003000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1

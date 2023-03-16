@@ -28,6 +28,8 @@ public class GunAgent : Agent
     public List<GameObject> enemies = new List<GameObject>();
     public Color detectedEnemyColor = Color.white;
 
+    //public Transform testTarget;
+
     private bool shotAllowed = true;
     private Quaternion startGunRotation;
     private int currentPoints = 0;
@@ -64,6 +66,9 @@ public class GunAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
+        //float dot = Quaternion.Dot(transform.rotation, Quaternion.LookRotation(testTarget.position - transform.position));
+        //Debug.Log("trasform.rotaton = "+ transform.rotation + "  trasform.localRotaton = " + transform.localRotation + "  Quaternion.Dot = " + dot);
+
         // It is necessary to find all observed enemies in a given radius and transfer given number <observedEnemiesNumber>
         // in the form of flat normalized coordinates Vector2 to the sensor
         Collider[] enemiesColliders = new Collider[observedEnemiesNumber];
@@ -89,7 +94,13 @@ public class GunAgent : Agent
 
         foreach (GameObject enemy in observedEnemies)
         {
-            sensor.AddObservation(GetNoramalizedVector2(enemy.transform.position));
+            Quaternion enemyDirection = Quaternion.LookRotation(enemy.transform.position - transform.position);
+            float enemyDirectionDot = Quaternion.Dot(transform.rotation, enemyDirection);
+            //Debug.Log("transform.eulerAngles.y = " + transform.eulerAngles.y + "  enemyDirection.eulerAngles.y = " + enemyDirection.eulerAngles.y);
+            sensor.AddObservation(enemyDirectionDot);
+
+            float enemyDistance = Vector3.Magnitude(enemy.transform.position - transform.position);
+            sensor.AddObservation(enemyDistance / enemyDetectionRadius);
         }
 
         int difference = observedEnemiesNumber - observedEnemies.Count;
@@ -97,7 +108,8 @@ public class GunAgent : Agent
         {
             for (int i = 0; i < difference; i++)
             {
-                sensor.AddObservation(Vector2.zero);
+                sensor.AddObservation(0f);
+                sensor.AddObservation(0f);
             }
         }
 
@@ -106,67 +118,64 @@ public class GunAgent : Agent
             Debug.Log("Error. <observedEnemies.Count> exceeded the expected parameters");
         }
 
-        //foreach (Collider enemyCollider in enemiesColliders)
-        //{
-
-        //    if (enemyCollider != null)
-        //    {
-        //        enemyMaterial = enemyCollider.GetComponent<Renderer>().material;
-        //        enemyMaterial.color = detectedEnemyColor;
-
-        //        sensor.AddObservation(GetNoramalizedVector2(enemyCollider.transform.position));
-        //    }
-        //    else
-        //    {
-        //        // If the number of observed enemies is less than <observedEnemiesNumber>,
-        //        // then the remaining free cells of the array are filled with zeros
-        //        sensor.AddObservation(Vector2.zero);
-        //    }
-        //}
-
         // Normalized rotation around the y-axis [0,1]
-        sensor.AddObservation(transform.rotation.eulerAngles.y / 360.0f);
+        //sensor.AddObservation(transform.rotation.eulerAngles.y / 360.0f);
+
+
 
         sensor.AddObservation(shotAllowed);
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
-        float controlSignalRotation = Mathf.Clamp(actionBuffers.ContinuousActions[0], -1f, 1f);
-        transform.Rotate(Vector3.up, gunTurningSpeed * controlSignalRotation);
+        AgentTurn(actionBuffers.DiscreteActions);
 
         int controlSignalShot = actionBuffers.DiscreteActions[0];
         if (controlSignalShot == 1 && shotAllowed)
             shotCor = StartCoroutine(Shot());
     }
 
-    public override void Heuristic(in ActionBuffers actionsOut)
+    private void AgentTurn(ActionSegment<int> discreteActions)
     {
-        var continuousActionsOut = actionsOut.ContinuousActions;
-        var discreteActionsOut = actionsOut.DiscreteActions;
-        continuousActionsOut[0] = Input.GetAxis("Horizontal");
-        discreteActionsOut[0] = Input.GetKey(KeyCode.Space) ? 1 : 0;
+        float controlSignalRotation = 0;
+
+        if (discreteActions[1] == 1)
+            controlSignalRotation = 1;
+        else if(discreteActions[1] == 2)
+            controlSignalRotation = -1;
+
+        transform.Rotate(Vector3.up, gunTurningSpeed * controlSignalRotation);
     }
 
-    private Vector2 GetNoramalizedVector2(Vector3 enemyPosition)
+    public override void Heuristic(in ActionBuffers actionsOut)
     {
-        enemyPosition -= transform.position;
-        float normalizedValueX = (enemyPosition.x + enemyDetectionRadius) / (enemyDetectionRadius * 2f);
-        float normalizedValueZ = (enemyPosition.z + enemyDetectionRadius) / (enemyDetectionRadius * 2f);
-        //Debug.Log(new Vector2(normalizedValueX, normalizedValueZ));
-        return new Vector2(normalizedValueX, normalizedValueZ);
+        var discreteActionsOut = actionsOut.DiscreteActions;
+        discreteActionsOut.Clear();
+
+        discreteActionsOut[0] = Input.GetKey(KeyCode.Space) ? 1 : 0;
+
+        if (Input.GetKey(KeyCode.D))
+            discreteActionsOut[1] = 1;
+
+        if (Input.GetKey(KeyCode.A))
+            discreteActionsOut[1] = 2;
     }
 
     private IEnumerator Shot()
     {
         shotAllowed = false;
         laserRenderer.enabled = true;
-        //Debug.Log("SHOT");
+        
         if (Physics.Raycast(laserFirePoint.position, laserFirePoint.forward, out RaycastHit hit, rayDistance))
         {
             DrawLaser(laserFirePoint.position, hit.point);
-            DestroyEnemy(hit.transform.gameObject);
-            AddReward(0.05f);
+
+            if (observedEnemies.Contains(hit.transform.gameObject))
+            {
+                DestroyEnemy(hit.transform.gameObject);
+                AddReward(0.05f);
+            }
+            
             currentPoints++;
             if (currentPoints == winPoints)
                 EndEpisode();
