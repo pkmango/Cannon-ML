@@ -43,7 +43,6 @@ public class GunAgent : Agent
     {
         startGunRotation = transform.rotation;
         observedEnemies = new List<GameObject>(observedEnemiesNumber);
-        //Debug.Log(observedEnemies.Count);
     }
 
     public override void OnEpisodeBegin()
@@ -66,11 +65,6 @@ public class GunAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        //float dot = Quaternion.Dot(transform.rotation, Quaternion.LookRotation(testTarget.position - transform.position));
-        //Debug.Log("trasform.rotaton = "+ transform.rotation + "  trasform.localRotaton = " + transform.localRotation + "  Quaternion.Dot = " + dot);
-
-        // It is necessary to find all observed enemies in a given radius and transfer given number <observedEnemiesNumber>
-        // in the form of flat normalized coordinates Vector2 to the sensor
         Collider[] enemiesColliders = new Collider[observedEnemiesNumber];
         Physics.OverlapSphereNonAlloc(transform.position, enemyDetectionRadius, enemiesColliders, enemyLayerMask);
 
@@ -94,11 +88,10 @@ public class GunAgent : Agent
 
         foreach (GameObject enemy in observedEnemies)
         {
-            Quaternion enemyDirection = Quaternion.LookRotation(enemy.transform.position - transform.position);
-            float enemyDirectionDot = Quaternion.Dot(transform.rotation, enemyDirection);
-            //Debug.Log("transform.eulerAngles.y = " + transform.eulerAngles.y + "  enemyDirection.eulerAngles.y = " + enemyDirection.eulerAngles.y);
-            sensor.AddObservation(enemyDirectionDot);
-
+            Vector3 targetDirection = enemy.transform.position - transform.position;
+            float angleToTarget = Quaternion.FromToRotation(transform.forward, targetDirection).eulerAngles.y;
+            sensor.AddObservation(angleToTarget / 360f);
+            //Debug.Log(angleToTarget / 360f);
             float enemyDistance = Vector3.Magnitude(enemy.transform.position - transform.position);
             sensor.AddObservation(enemyDistance / enemyDetectionRadius);
         }
@@ -118,17 +111,14 @@ public class GunAgent : Agent
             Debug.Log("Error. <observedEnemies.Count> exceeded the expected parameters");
         }
 
-        // Normalized rotation around the y-axis [0,1]
-        //sensor.AddObservation(transform.rotation.eulerAngles.y / 360.0f);
-
-
-
         sensor.AddObservation(shotAllowed);
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
-        AgentTurn(actionBuffers.DiscreteActions);
+        //AgentTurn(actionBuffers.DiscreteActions);
+        float controlSignalRotation = Mathf.Clamp(actionBuffers.ContinuousActions[0], -1f, 1f);
+        transform.Rotate(Vector3.up, gunTurningSpeed * controlSignalRotation);
 
         int controlSignalShot = actionBuffers.DiscreteActions[0];
         if (controlSignalShot == 1 && shotAllowed)
@@ -150,15 +140,17 @@ public class GunAgent : Agent
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var discreteActionsOut = actionsOut.DiscreteActions;
+        var continuousActionsOut = actionsOut.ContinuousActions;
         discreteActionsOut.Clear();
 
         discreteActionsOut[0] = Input.GetKey(KeyCode.Space) ? 1 : 0;
+        continuousActionsOut[0] = Input.GetAxis("Horizontal");
 
-        if (Input.GetKey(KeyCode.D))
-            discreteActionsOut[1] = 1;
+        //if (Input.GetKey(KeyCode.D))
+        //    discreteActionsOut[1] = 1;
 
-        if (Input.GetKey(KeyCode.A))
-            discreteActionsOut[1] = 2;
+        //if (Input.GetKey(KeyCode.A))
+        //    discreteActionsOut[1] = 2;
     }
 
     private IEnumerator Shot()
@@ -168,15 +160,15 @@ public class GunAgent : Agent
         
         if (Physics.Raycast(laserFirePoint.position, laserFirePoint.forward, out RaycastHit hit, rayDistance))
         {
-            DrawLaser(laserFirePoint.position, hit.point);
-
             if (observedEnemies.Contains(hit.transform.gameObject))
             {
-                DestroyEnemy(hit.transform.gameObject);
                 AddReward(0.05f);
+                currentPoints++;
             }
-            
-            currentPoints++;
+
+            DrawLaser(laserFirePoint.position, hit.point);
+            DestroyEnemy(hit.transform.gameObject);
+
             if (currentPoints == winPoints)
                 EndEpisode();
         }
