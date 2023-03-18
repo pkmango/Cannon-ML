@@ -175,6 +175,7 @@ public class GunAgent : Agent
         else
         {
             DrawLaser(laserFirePoint.position, laserFirePoint.forward * rayDistance + transform.position);
+            AddReward(0.001f);
         }
 
         yield return new WaitForSeconds(laserVisibilityDelay);
@@ -195,7 +196,7 @@ public class GunAgent : Agent
         if (other.tag == "Enemy")
         {
             DestroyEnemy(other.gameObject);
-            AddReward(-0.05f);
+            AddReward(-0.04f);
             currentHp--;
             if (currentHp == 0)
                 EndEpisode();
