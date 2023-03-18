@@ -101,8 +101,8 @@ public class GunAgent : Agent
         {
             for (int i = 0; i < difference; i++)
             {
-                sensor.AddObservation(0f);
-                sensor.AddObservation(0f);
+                sensor.AddObservation(-1f);
+                sensor.AddObservation(-1f);
             }
         }
 
@@ -112,6 +112,7 @@ public class GunAgent : Agent
         }
 
         sensor.AddObservation(shotAllowed);
+        sensor.AddObservation(observedEnemies.Count);
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
@@ -175,7 +176,7 @@ public class GunAgent : Agent
         else
         {
             DrawLaser(laserFirePoint.position, laserFirePoint.forward * rayDistance + transform.position);
-            AddReward(0.001f);
+            AddReward(-0.001f);
         }
 
         yield return new WaitForSeconds(laserVisibilityDelay);
