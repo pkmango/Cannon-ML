@@ -124,19 +124,24 @@ public class GunAgent : Agent
         int controlSignalShot = actionBuffers.DiscreteActions[0];
         if (controlSignalShot == 1 && shotAllowed)
             shotCor = StartCoroutine(Shot());
+
+        if (actionBuffers.ContinuousActions[0] != 0f)
+            AddReward(-0.0002f);
+
+        //Debug.Log(GetCumulativeReward());
     }
 
-    private void AgentTurn(ActionSegment<int> discreteActions)
-    {
-        float controlSignalRotation = 0;
+    //private void AgentTurn(ActionSegment<int> discreteActions)
+    //{
+    //    float controlSignalRotation = 0;
 
-        if (discreteActions[1] == 1)
-            controlSignalRotation = 1;
-        else if(discreteActions[1] == 2)
-            controlSignalRotation = -1;
+    //    if (discreteActions[1] == 1)
+    //        controlSignalRotation = 1;
+    //    else if(discreteActions[1] == 2)
+    //        controlSignalRotation = -1;
 
-        transform.Rotate(Vector3.up, gunTurningSpeed * controlSignalRotation);
-    }
+    //    transform.Rotate(Vector3.up, gunTurningSpeed * controlSignalRotation);
+    //}
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
@@ -176,7 +181,7 @@ public class GunAgent : Agent
         else
         {
             DrawLaser(laserFirePoint.position, laserFirePoint.forward * rayDistance + transform.position);
-            AddReward(-0.001f);
+            AddReward(-0.005f);
         }
 
         yield return new WaitForSeconds(laserVisibilityDelay);
