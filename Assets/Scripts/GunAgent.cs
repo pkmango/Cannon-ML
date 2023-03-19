@@ -27,11 +27,13 @@ public class GunAgent : Agent
     [HideInInspector]
     public List<GameObject> enemies = new List<GameObject>();
     public Color detectedEnemyColor = Color.white;
+    [HideInInspector]
+    public int currentPoints = 0;
+    [HideInInspector]
+    public int currentHp = 20;
 
     private bool shotAllowed = true;
     private Quaternion startGunRotation;
-    private int currentPoints = 0;
-    private int currentHp = 20;
     private Coroutine shotCor;
     private Material enemyMaterial;
     // list of tracked targets
@@ -196,5 +198,4 @@ public class GunAgent : Agent
 
         Destroy(enemy);
     }
-
 }
