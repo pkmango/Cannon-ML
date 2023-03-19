@@ -28,8 +28,6 @@ public class GunAgent : Agent
     public List<GameObject> enemies = new List<GameObject>();
     public Color detectedEnemyColor = Color.white;
 
-    //public Transform testTarget;
-
     private bool shotAllowed = true;
     private Quaternion startGunRotation;
     private int currentPoints = 0;
@@ -91,7 +89,7 @@ public class GunAgent : Agent
             Vector3 targetDirection = enemy.transform.position - transform.position;
             float angleToTarget = Quaternion.FromToRotation(transform.forward, targetDirection).eulerAngles.y;
             sensor.AddObservation(angleToTarget / 360f);
-            //Debug.Log(angleToTarget / 360f);
+
             float enemyDistance = Vector3.Magnitude(enemy.transform.position - transform.position);
             sensor.AddObservation(enemyDistance / enemyDetectionRadius);
         }
@@ -131,18 +129,6 @@ public class GunAgent : Agent
         //Debug.Log(GetCumulativeReward());
     }
 
-    //private void AgentTurn(ActionSegment<int> discreteActions)
-    //{
-    //    float controlSignalRotation = 0;
-
-    //    if (discreteActions[1] == 1)
-    //        controlSignalRotation = 1;
-    //    else if(discreteActions[1] == 2)
-    //        controlSignalRotation = -1;
-
-    //    transform.Rotate(Vector3.up, gunTurningSpeed * controlSignalRotation);
-    //}
-
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var discreteActionsOut = actionsOut.DiscreteActions;
@@ -151,12 +137,6 @@ public class GunAgent : Agent
 
         discreteActionsOut[0] = Input.GetKey(KeyCode.Space) ? 1 : 0;
         continuousActionsOut[0] = Input.GetAxis("Horizontal");
-
-        //if (Input.GetKey(KeyCode.D))
-        //    discreteActionsOut[1] = 1;
-
-        //if (Input.GetKey(KeyCode.A))
-        //    discreteActionsOut[1] = 2;
     }
 
     private IEnumerator Shot()

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
@@ -19,9 +18,6 @@ public class Enemy : MonoBehaviour
         // Altitude correction
         transform.position = new Vector3(transform.position.x, playerPosition.y, transform.position.z);
         moveDirection = Vector3.Normalize(playerPosition - transform.position);
-
-        // del
-        //StartCoroutine(SetColor());
     }
 
     void Update()
@@ -44,16 +40,4 @@ public class Enemy : MonoBehaviour
             return Vector3.zero;
         }
     }
-
-    //private IEnumerator SetColor()
-    //{
-    //    while (true)
-    //    {
-    //        Material thisMat = GetComponent<Renderer>().material;
-    //        thisMat.color = Color.green;
-    //        Debug.Log("Покрашен");
-    //        yield return new WaitForSeconds(0.5f);
-    //    }
-        
-    //}
 }

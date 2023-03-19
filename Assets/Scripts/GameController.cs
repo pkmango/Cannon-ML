@@ -30,21 +30,10 @@ public class GameController : MonoBehaviour
             float zPos = randomRespZone.transform.position.z + Random.Range(-extents.z, extents.z);
             Vector3 respPoint = new Vector3(xPos, 0f, zPos);
 
-            //enemies.Add(Instantiate(enemyPrefab, respPoint, Quaternion.identity));
             Instantiate(enemyPrefab, respPoint, Quaternion.identity);
 
             yield return new WaitForSeconds(enemySpawnDelay);
         }
         
     }
-
-    //public void ResetEnvironment()
-    //{
-    //    foreach (GameObject i in enemies)
-    //    {
-    //        Destroy(i);
-    //    }
-
-    //    enemies.Clear();
-    //}
 }
