@@ -22,6 +22,7 @@ public class GameController : MonoBehaviour
 
     private IEnumerator RespawnEnemy(GameObject[] respZones)
     {
+        // For continuous agent training, enemies respawn endlessly
         while (true)
         {
             GameObject randomRespZone = respZones[Random.Range(0, respawnZones.Length - 1)];

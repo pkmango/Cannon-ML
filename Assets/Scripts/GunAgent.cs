@@ -18,12 +18,12 @@ public class GunAgent : Agent
     public int winPoints = 20;
     public LineRenderer laserRenderer;
     public Transform laserFirePoint;
-    public float rayDistance = 10f;
+    public float rayDistance = 10f; // Maximum laser range
     public LayerMask enemyLayerMask;
     [Min(1f)]
     public float enemyDetectionRadius = 6f;
     [Tooltip("Each observable enemy adds 2 values to Vector Observations > Space Size")]
-    public int observedEnemiesNumber = 5; //Maximum number of simultaneously observed enemies
+    public int observedEnemiesNumber = 5; // Maximum number of simultaneously observed enemies
     [HideInInspector]
     public List<GameObject> enemies = new List<GameObject>();
     public Color detectedEnemyColor = Color.white;
@@ -34,9 +34,9 @@ public class GunAgent : Agent
 
     private bool shotAllowed = true;
     private Quaternion startGunRotation;
-    private Coroutine shotCor;
+    private Coroutine shotCor; // For Shot()
     private Material enemyMaterial;
-    // list of tracked targets
+    // List of tracked targets
     private List<GameObject> observedEnemies;
 
     private void Start()
@@ -68,6 +68,7 @@ public class GunAgent : Agent
         Collider[] enemiesColliders = new Collider[observedEnemiesNumber];
         Physics.OverlapSphereNonAlloc(transform.position, enemyDetectionRadius, enemiesColliders, enemyLayerMask);
 
+        // If there is free space, write the detected enemies to the buffer <observedEnemies>
         foreach (Collider enemyCollider in enemiesColliders)
         {
             if (enemyCollider != null && observedEnemies.Count < observedEnemiesNumber)
@@ -88,14 +89,18 @@ public class GunAgent : Agent
 
         foreach (GameObject enemy in observedEnemies)
         {
+            // This adds the normalized value of the angle (between 0 and 1) between the direction of the target and the current one.
             Vector3 targetDirection = enemy.transform.position - transform.position;
             float angleToTarget = Quaternion.FromToRotation(transform.forward, targetDirection).eulerAngles.y;
             sensor.AddObservation(angleToTarget / 360f);
 
+            // Also, the agent can track the distance to the target
             float enemyDistance = Vector3.Magnitude(enemy.transform.position - transform.position);
             sensor.AddObservation(enemyDistance / enemyDetectionRadius);
         }
 
+        // If there are unused cells in the buffer <observedEnemies>,
+        // we need to write the values <-1> there so that they are clearly different from all other values
         int difference = observedEnemiesNumber - observedEnemies.Count;
         if (difference > 0)
         {
@@ -117,18 +122,16 @@ public class GunAgent : Agent
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
-        //AgentTurn(actionBuffers.DiscreteActions);
         float controlSignalRotation = Mathf.Clamp(actionBuffers.ContinuousActions[0], -1f, 1f);
         transform.Rotate(Vector3.up, gunTurningSpeed * controlSignalRotation);
+
+        // A small penalty to minimize unnecessary movements
+        if (actionBuffers.ContinuousActions[0] != 0f)
+            AddReward(-0.0002f);
 
         int controlSignalShot = actionBuffers.DiscreteActions[0];
         if (controlSignalShot == 1 && shotAllowed)
             shotCor = StartCoroutine(Shot());
-
-        if (actionBuffers.ContinuousActions[0] != 0f)
-            AddReward(-0.0002f);
-
-        //Debug.Log(GetCumulativeReward());
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -148,8 +151,10 @@ public class GunAgent : Agent
         
         if (Physics.Raycast(laserFirePoint.position, laserFirePoint.forward, out RaycastHit hit, rayDistance))
         {
+            // Hitting the target
             if (observedEnemies.Contains(hit.transform.gameObject))
             {
+                // Random hits are not rewarded
                 AddReward(0.05f);
                 currentPoints++;
             }
@@ -162,6 +167,7 @@ public class GunAgent : Agent
         }
         else
         {
+            // Miss
             DrawLaser(laserFirePoint.position, laserFirePoint.forward * rayDistance + transform.position);
             AddReward(-0.005f);
         }
@@ -183,9 +189,11 @@ public class GunAgent : Agent
     {
         if (other.tag == "Enemy")
         {
+            // The enemy touched the agent
             DestroyEnemy(other.gameObject);
             AddReward(-0.04f);
             currentHp--;
+
             if (currentHp == 0)
                 EndEpisode();
         }

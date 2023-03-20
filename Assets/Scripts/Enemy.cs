@@ -11,6 +11,7 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
+        // The enemy finds the player and adds himself to the list
         Vector3 playerPosition = GetPlayerPosition();
         if (player != null)
             player.GetComponent<GunAgent>().enemies.Add(gameObject);
